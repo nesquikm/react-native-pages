@@ -26,6 +26,8 @@ export default class Pages extends PureComponent {
 
     horizontal: true,
     rtl: false,
+
+    layoutDelay: undefined,
   };
 
   static propTypes = {
@@ -56,6 +58,8 @@ export default class Pages extends PureComponent {
     onLayout: PropTypes.func,
     onScrollEnd: PropTypes.func,
     renderPager: PropTypes.func,
+
+    layoutDelay: PropTypes.number,
   };
 
   constructor(props) {
@@ -116,13 +120,23 @@ export default class Pages extends PureComponent {
 
   onLayout(event) {
     let { width, height } = event.nativeEvent.layout;
-    let { onLayout } = this.props;
+    let { onLayout, layoutDelay } = this.props;
 
     if ('function' === typeof onLayout) {
       onLayout(event);
     }
 
-    this.setState({ width, height, layout: true });
+    if (layoutDelay) {
+      if (this.timer)
+        clearTimeout(this.timer);
+
+      this.timer = setTimeout(() => {
+        this.timer = undefined;
+        this.setState({ width, height, layout: true });
+      }, layoutDelay);
+    } else {
+      this.setState({ width, height, layout: true });
+    }
   }
 
   onScroll(event) {
