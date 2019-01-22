@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { PureComponent, Children } from 'react';
-import { View, ScrollView, Animated, Platform, ViewPropTypes } from 'react-native';
+import { View, ScrollView, Animated, Platform, ViewPropTypes, InteractionManager } from 'react-native';
 
 import Indicator from '../indicator';
 import styles from './styles';
@@ -27,7 +27,7 @@ export default class Pages extends PureComponent {
     horizontal: true,
     rtl: false,
 
-    layoutDelay: undefined,
+    layoutDelay: false,
   };
 
   static propTypes = {
@@ -59,7 +59,7 @@ export default class Pages extends PureComponent {
     onScrollEnd: PropTypes.func,
     renderPager: PropTypes.func,
 
-    layoutDelay: PropTypes.number,
+    layoutDelay: PropTypes.bool,
   };
 
   constructor(props) {
@@ -127,13 +127,9 @@ export default class Pages extends PureComponent {
     }
 
     if (layoutDelay) {
-      if (this.timer)
-        clearTimeout(this.timer);
-
-      this.timer = setTimeout(() => {
-        this.timer = undefined;
+      InteractionManager.runAfterInteractions(() => {
         this.setState({ width, height, layout: true });
-      }, layoutDelay);
+      });
     } else {
       this.setState({ width, height, layout: true });
     }
