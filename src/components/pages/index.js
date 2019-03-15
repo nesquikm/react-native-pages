@@ -27,7 +27,7 @@ export default class Pages extends PureComponent {
     horizontal: true,
     rtl: false,
 
-    layoutDelay: false,
+    layoutDelay: 0,
   };
 
   static propTypes = {
@@ -59,7 +59,7 @@ export default class Pages extends PureComponent {
     onScrollEnd: PropTypes.func,
     renderPager: PropTypes.func,
 
-    layoutDelay: PropTypes.bool,
+    layoutDelay: PropTypes.number,
   };
 
   constructor(props) {
@@ -127,9 +127,13 @@ export default class Pages extends PureComponent {
     }
 
     if (layoutDelay) {
-      InteractionManager.runAfterInteractions(() => {
+      if (this.layoutTimer)
+        clearTimeout(this.layoutTimer);
+
+      this.layoutTimer = setTimeout(() => {
         this.setState({ width, height, layout: true });
-      });
+        this.layoutTimer = undefined;
+      }, layoutDelay);
     } else {
       this.setState({ width, height, layout: true });
     }
